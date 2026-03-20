@@ -4,7 +4,7 @@ import type { User } from "@supabase/supabase-js";
 
 const PURPLE      = "#5603ad";
 const PURPLE_MID  = "#8367c7";
-const MINT        = "#b3e9c7";
+//const MINT        = "#b3e9c7";
 const FG          = "#1a0f2e";
 const FG_MUTED    = "#4a3f6b";
 const FG_SUBTLE   = "#8a7fab";
