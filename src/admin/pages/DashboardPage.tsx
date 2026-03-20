@@ -3,75 +3,81 @@ import { STATUS_COLORS, STATUS_LABELS } from "@/types";
 
 export default function DashboardPage() {
   const { data: commissions, loading: cLoading } = useCommissions();
-  const { data: messages,    loading: mLoading  } = useMessages();
+  const { data: messages, loading: mLoading } = useMessages();
 
   const stats = [
-    { label:"Total Commissions", value: commissions.length, color:"#5603ad" },
-    { label:"Active",            value: commissions.filter(c => !["completed","cancelled"].includes(c.status)).length, color:"#8367c7" },
-    { label:"Completed",         value: commissions.filter(c => c.status === "completed").length, color:"#10b981" },
-    { label:"Unread Messages",   value: messages.filter(m => !m.read).length, color:"#f59e0b" },
+    { label: "Total Commissions", value: commissions.length, accent: "#7C3AED" },
+    { label: "Active", value: commissions.filter(c => !["completed", "cancelled"].includes(c.status)).length, accent: "#8B5CF6" },
+    { label: "Completed", value: commissions.filter(c => c.status === "completed").length, accent: "#10B981" },
+    { label: "Unread Messages", value: messages.filter(m => !m.read).length, accent: "#F59E0B" },
   ];
 
   const recentCommissions = commissions.slice(0, 5);
-  const recentMessages    = messages.slice(0, 4);
-
-  if (cLoading || mLoading) {
-    return (
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        {[...Array(4)].map((_,i) => (
-          <div key={i} className="h-24 rounded-2xl animate-pulse" style={{ background:"rgba(131,103,199,0.08)" }}/>
-        ))}
-      </div>
-    );
-  }
+  const recentMessages = messages.slice(0, 5);
 
   return (
-    <div className="space-y-6 max-w-6xl">
+    <div style={{ maxWidth: 1100, padding: "2rem 2.5rem" }}>
       {/* Stat cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "1.25rem", marginBottom: "2rem" }}>
         {stats.map(s => (
-          <div
-            key={s.label}
-            className="p-5 rounded-2xl"
-            style={{ background:"rgba(255,255,255,0.7)", backdropFilter:"blur(16px)", border:"1px solid rgba(255,255,255,0.9)", boxShadow:"0 4px 16px rgba(86,3,173,0.06)" }}
-          >
-            <p style={{ fontFamily:"var(--font-display)", fontSize:"2.2rem", fontWeight:700, color:s.color, lineHeight:1 }}>
-              {s.value}
-            </p>
-            <p style={{ fontFamily:"var(--font-mono)", fontSize:"0.6rem", letterSpacing:"0.15em", textTransform:"uppercase", color:"var(--fg-subtle)", marginTop:"6px" }}>
+          <div key={s.label} style={{
+            background: "#fff",
+            border: "1px solid #EDE9FE",
+            borderRadius: 16,
+            padding: "1.5rem",
+            display: "flex",
+            flexDirection: "column",
+            gap: 8,
+            boxShadow: "0 1px 4px rgba(124,58,237,0.06)"
+          }}>
+            {cLoading || mLoading ? (
+              <div style={{ height: 44, borderRadius: 8, background: "#F5F3FF", animation: "pulse 1.5s infinite" }} />
+            ) : (
+              <span style={{ fontSize: "2.75rem", fontWeight: 700, color: s.accent, lineHeight: 1, fontVariantNumeric: "tabular-nums" }}>
+                {s.value}
+              </span>
+            )}
+            <span style={{ fontSize: "0.7rem", letterSpacing: "0.12em", textTransform: "uppercase", color: "#9CA3AF", fontWeight: 500 }}>
               {s.label}
-            </p>
+            </span>
           </div>
         ))}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Recent commissions */}
-        <div
-          className="rounded-2xl overflow-hidden"
-          style={{ background:"rgba(255,255,255,0.7)", backdropFilter:"blur(16px)", border:"1px solid rgba(255,255,255,0.9)", boxShadow:"0 4px 16px rgba(86,3,173,0.06)" }}
-        >
-          <div className="px-5 py-4 border-b" style={{ borderColor:"rgba(131,103,199,0.1)" }}>
-            <h2 style={{ fontFamily:"var(--font-display)", fontSize:"1rem", fontWeight:700, color:"var(--fg)" }}>Recent Commissions</h2>
+      {/* Two-column content */}
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1.25rem" }}>
+        {/* Recent Commissions */}
+        <div style={{ background: "#fff", border: "1px solid #EDE9FE", borderRadius: 16, overflow: "hidden", boxShadow: "0 1px 4px rgba(124,58,237,0.06)" }}>
+          <div style={{ padding: "1.25rem 1.5rem", borderBottom: "1px solid #F3F0FF" }}>
+            <h2 style={{ margin: 0, fontSize: "0.9rem", fontWeight: 600, color: "#1F1235", letterSpacing: "-0.01em" }}>Recent Commissions</h2>
           </div>
-          <div className="divide-y" style={{ '--tw-divide-opacity':1 } as React.CSSProperties}>
-            {recentCommissions.length === 0 && (
-              <p className="px-5 py-8 text-center" style={{ fontFamily:"var(--font-sans)", fontSize:"0.85rem", color:"var(--fg-subtle)" }}>No commissions yet.</p>
-            )}
-            {recentCommissions.map(c => (
-              <div key={c.id} className="px-5 py-3 flex items-center justify-between gap-3">
-                <div className="min-w-0">
-                  <p style={{ fontFamily:"var(--font-sans)", fontWeight:500, fontSize:"0.875rem", color:"var(--fg)", overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>
+          <div>
+            {cLoading ? (
+              <div style={{ padding: "1.5rem", display: "flex", flexDirection: "column", gap: 12 }}>
+                {[...Array(3)].map((_, i) => <div key={i} style={{ height: 40, borderRadius: 8, background: "#F5F3FF" }} />)}
+              </div>
+            ) : recentCommissions.length === 0 ? (
+              <p style={{ padding: "2.5rem", textAlign: "center", color: "#9CA3AF", fontSize: "0.875rem", margin: 0 }}>No commissions yet.</p>
+            ) : recentCommissions.map((c, i) => (
+              <div key={c.id} style={{
+                display: "flex", alignItems: "center", justifyContent: "space-between",
+                padding: "0.875rem 1.5rem",
+                borderBottom: i < recentCommissions.length - 1 ? "1px solid #F9F7FF" : "none",
+                gap: 12
+              }}>
+                <div style={{ minWidth: 0 }}>
+                  <p style={{ margin: 0, fontSize: "0.875rem", fontWeight: 500, color: "#1F1235", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
                     {c.client_name}
                   </p>
-                  <p style={{ fontFamily:"var(--font-mono)", fontSize:"0.6rem", color:"var(--fg-subtle)", textTransform:"uppercase", letterSpacing:"0.08em" }}>
-                    {c.medium ?? "—"} {c.price ? `· $${c.price}` : ""}
+                  <p style={{ margin: 0, fontSize: "0.75rem", color: "#9CA3AF", marginTop: 2 }}>
+                    {c.medium ?? "—"}{c.price ? ` · $${c.price}` : ""}
                   </p>
                 </div>
-                <span
-                  className="shrink-0 px-2.5 py-1 rounded-full text-xs font-medium"
-                  style={{ background:`${STATUS_COLORS[c.status]}18`, color:STATUS_COLORS[c.status], fontFamily:"var(--font-mono)", fontSize:"0.6rem", letterSpacing:"0.08em", textTransform:"uppercase" }}
-                >
+                <span style={{
+                  flexShrink: 0, padding: "3px 10px", borderRadius: 20, fontSize: "0.65rem",
+                  fontWeight: 600, letterSpacing: "0.06em", textTransform: "uppercase",
+                  background: `${STATUS_COLORS[c.status]}18`, color: STATUS_COLORS[c.status]
+                }}>
                   {STATUS_LABELS[c.status]}
                 </span>
               </div>
@@ -79,38 +85,45 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        {/* Recent messages */}
-        <div
-          className="rounded-2xl overflow-hidden"
-          style={{ background:"rgba(255,255,255,0.7)", backdropFilter:"blur(16px)", border:"1px solid rgba(255,255,255,0.9)", boxShadow:"0 4px 16px rgba(86,3,173,0.06)" }}
-        >
-          <div className="px-5 py-4 border-b" style={{ borderColor:"rgba(131,103,199,0.1)" }}>
-            <h2 style={{ fontFamily:"var(--font-display)", fontSize:"1rem", fontWeight:700, color:"var(--fg)" }}>Recent Messages</h2>
+        {/* Recent Messages */}
+        <div style={{ background: "#fff", border: "1px solid #EDE9FE", borderRadius: 16, overflow: "hidden", boxShadow: "0 1px 4px rgba(124,58,237,0.06)" }}>
+          <div style={{ padding: "1.25rem 1.5rem", borderBottom: "1px solid #F3F0FF" }}>
+            <h2 style={{ margin: 0, fontSize: "0.9rem", fontWeight: 600, color: "#1F1235", letterSpacing: "-0.01em" }}>Recent Messages</h2>
           </div>
           <div>
-            {recentMessages.length === 0 && (
-              <p className="px-5 py-8 text-center" style={{ fontFamily:"var(--font-sans)", fontSize:"0.85rem", color:"var(--fg-subtle)" }}>No messages yet.</p>
-            )}
-            {recentMessages.map(m => (
-              <div key={m.id} className="px-5 py-3 flex items-start gap-3 border-b last:border-0" style={{ borderColor:"rgba(131,103,199,0.08)" }}>
-                <div
-                  className="mt-1 w-2 h-2 rounded-full shrink-0"
-                  style={{ background: m.read ? "transparent" : "#5603ad", border: m.read ? "1.5px solid #8a7fab" : "none" }}
-                />
-                <div className="min-w-0">
-                  <p style={{ fontFamily:"var(--font-sans)", fontWeight:500, fontSize:"0.875rem", color:"var(--fg)" }}>{m.name}</p>
-                  <p style={{ fontFamily:"var(--font-sans)", fontSize:"0.78rem", color:"var(--fg-muted)", overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>
+            {mLoading ? (
+              <div style={{ padding: "1.5rem", display: "flex", flexDirection: "column", gap: 12 }}>
+                {[...Array(3)].map((_, i) => <div key={i} style={{ height: 40, borderRadius: 8, background: "#F5F3FF" }} />)}
+              </div>
+            ) : recentMessages.length === 0 ? (
+              <p style={{ padding: "2.5rem", textAlign: "center", color: "#9CA3AF", fontSize: "0.875rem", margin: 0 }}>No messages yet.</p>
+            ) : recentMessages.map((m, i) => (
+              <div key={m.id} style={{
+                display: "flex", alignItems: "flex-start", gap: 12,
+                padding: "0.875rem 1.5rem",
+                borderBottom: i < recentMessages.length - 1 ? "1px solid #F9F7FF" : "none"
+              }}>
+                <div style={{
+                  marginTop: 5, width: 7, height: 7, borderRadius: "50%", flexShrink: 0,
+                  background: m.read ? "transparent" : "#7C3AED",
+                  border: m.read ? "1.5px solid #D1D5DB" : "none"
+                }} />
+                <div style={{ minWidth: 0 }}>
+                  <p style={{ margin: 0, fontSize: "0.875rem", fontWeight: m.read ? 400 : 600, color: "#1F1235" }}>{m.name}</p>
+                  <p style={{ margin: 0, fontSize: "0.75rem", color: "#9CA3AF", marginTop: 2, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
                     {m.subject ?? m.message.slice(0, 50)}
                   </p>
-                  <p style={{ fontFamily:"var(--font-mono)", fontSize:"0.58rem", color:"var(--fg-subtle)", marginTop:"2px" }}>
-                    {new Date(m.created_at).toLocaleDateString("en-US",{ month:"short", day:"numeric", year:"numeric" })}
-                  </p>
                 </div>
+                <span style={{ flexShrink: 0, fontSize: "0.7rem", color: "#C4B5FD", marginLeft: "auto" }}>
+                  {new Date(m.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
+                </span>
               </div>
             ))}
           </div>
         </div>
       </div>
+
+      <style>{`@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.5} }`}</style>
     </div>
   );
 }
